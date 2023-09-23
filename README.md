@@ -1,6 +1,137 @@
 # 윤병현 React2-3-1
 
+
+
 <br>
+
+## 4주차 정리 (23.09.21)
+## 가. 클라이언트 사이드 렌더링(CSR)
+
+CSR은 SPA 트렌드와 CPU 성능 상승 + JS 표준화(리액트, 뷰, 앵귤러 등의 프레임워크 발전)와 함께 본격적으로 시작되었습니다.
+
+CSR은 쉽게 말해서 클라이언트에서 모두 처리하는 것인데, 서버에서 전체 페이지를 한번 렌더링 하여 보여주고 사용자가 요청할 때마다 리소스를 서버에서 제공받아 클리언트가 해석하고 렌더링 하는 방식이다. 
+
+서버 사이드 렌ㄹ딩과 달리 서버에 HTML 문서를 용청하는 것이 아니라, 브라우저에서 자바스크립트로 콘텐츠를 렌더링 한는 것이다.
+
+<aside>
+📌 SPA (Single Page Application): 최초 한 번 페이지 전체를 로딩한 뒤, 데이터만 변경하여 사용할 수 있는 애플리케이션
+
+</aside>
+
+CSR의 간단한 예제를 살펴보면, body 안에는 id=”root”만 달랑 하나 들어있고, 어플리케이션에 필요한 자바스크립트의 링크만 들어가있다.
+
+```tsx
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div class="root"></div>
+  <script src="app.js"></script>
+</body>
+</html>
+```
+
+HTML이 텅텅 비어있기 때문에 처음 접속하게 되면 빈 화면만 보이게 되고, 링크된 자바스크립트를 다운로드 받게 된다. 여기에는  어플리케이션에 필요한 로직, 구동하기 위한 프레임워크, 라이브러리의 소스코드들도 모두 포함되어 있다.
+
+그렇기 때문에 처음 다운로드 받을 때 꽤나 시간이 소요될 수 있다. 또한, 앞서 말했듯이 추가적으로 데이터가 필요하면 서버로부터 데이터를 받아와서 클라이언트 쪽에서 자바스크립트와 함께 동적으로 화면을 구성하여 사용자에게 최종적으로 화면을 보여주게 되는 것이다.
+
+## 주의점
+
+- 네이티브 앱처럼 느껴지는 웹 앱
+    - 전체 자바스크립트 번들을 다운로드 한다는 것은 렌더링할 모든 페이지가 이미 브라우저에 다운로드 되어 있다는 뜻입니다.
+    - 다른 페이지로 이동해도 서버에 요청할 필요 없이 바로 페이지를 이동할 수 있습니다.
+    - 페이지를 바꾸기 위해 새로 고칠 필요가 없습니다
+
+- 쉬운 페이지 전환
+    - 클라이언트에서의 내비게이션은 브라우저 화면을 새로 고칠 필요없이 다른 페이지로의 이동을 가능하게 만듭니다
+    - 페이지 간 전환에 멋진 효과를 넣을 수도 있습니다. 애니메이션을 방해할 요소가 없기 때문입니다.
+
+- 지연된 로딩과 성능
+    - 웹 앱은 최소 필요한 HTML만 렌더링합니다
+    - 버튼을 누르면 나오는 모달도 실제 버튼이 눌렀을 때 동적으로 생성하게 됩니다.
+
+- 서버 부하 감소 - 서버리스 환경에서 웹 앱을 제공할 수도 있습니다
+
+## 단점
+
+1. 네트워크 속도가 느린 환경에서는 번들이 모두 다운로드 될 때까지 계속 빈 페이지를 보아야합니다 그렇기 때문에 사용자가 첫 화면을 보기까지의 시간이 오래 걸릴 수 있다는 단점이 있습니다.
+2. SEO(Search Engine Optimization)를 꼽을 수 있다.
+
+📌SEO란 구글과 네이버와 같은 검색 엔진들은 서버에 등록된 웹 사이트를 돌아다니면서 웹 사이트의 HTML 문서를 분석해서 우리가 검색할 때 웹 사이트를 빠르게 검색할 수 있도록 도와준다. 하지만 CSR에서 사용되어지는 HTML의 바디는 앞 선 예제처럼 대부분 텅텅 비어있기 때문에 검색 엔진들은이 CSR로 작성된 웹페이지를 분석하는데 많은 어려움을 겪고 있다.
+
+## 코드 분석 (40p ~ 41p)
+
+```tsx
+import { useEffect } from 'react';
+import Head from 'next/head';
+import hljs from 'highlight.js';
+import javascript from 'highlight.js/lib/languages/javascript';
+
+function Highlight({ code, language = 'js' }) {
+
+  useEffect(() => {
+    hljs.registerLanguage('javascript', javascript);
+    hljs.initHighlighting();
+  }, []);
+
+  return (
+    <>
+      <Head>
+        <link rel='stylesheet' href='/highlight.css' />
+      </Head>
+      <pre>
+        <code className={language}>
+          {code}
+        </code>
+      </pre>
+    </>
+  )
+}
+
+export default Highlight;;
+```
+
+- CSR인 React에서는 다음 코드가 문제없이 작동하지만 Next.js의 빌드 과정에서는 문제가 생깁니다.
+- Highlight.js 라이브러리가 document라는 전역 변수를 사용하는데, 이 변수는 Node.js에서 제공하지 않으며 오직 브라우저에서만 접근할 수 있기 때문입니다.
+- 이 문제는 hljs 호출을 useEffect 훅으로 감싸서 해결할 수 있습니다.
+
+```tsx
+import { useEffect, useState } from 'react';
+import Highlight from '../../components/HighLight';
+
+function UseEffectPage() {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  return (
+    <>
+      <main className={styles.main}>
+        <h1> React.useEffect hook </h1>
+        <p className={styles.pageDescription}>
+          Highlight.js uses the global <code>document</code> keyword for highlighting code. <br />
+          Using the <code>React.useEffect</code> hook will make it highlight the desired content on
+          the client side, once the component has been mounted.
+        </p>
+        {isClient && <Highlight code={codeExample} language="js" />}
+      </main>
+    </>
+  );
+}
+
+export default UseEffectPage;
+```
+
+다음과 같이 React.useEffect와 React.usestate를 함께 써서 특정 컴포넌트를 정확히 클라이언트에서만 렌더링하도록 지정할 수 있습니다.
+
+<br>
+
 
 ## 3주차 정리 (23.09.14)
 ## 가.  SWC와 Babel 비교
