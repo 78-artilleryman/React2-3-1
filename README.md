@@ -4,6 +4,102 @@
 
 <br>
 
+## 7주차 정리 (23.10.12)
+
+## 페이지에서 경로 매개변수 사용
+
+```jsx
+mport React from 'react'
+import { useRouter } from 'next/router'
+
+export async function getSeverSidePropsName({params}) {
+
+  const {name} = params
+  return {
+    props:{
+      name,
+  },
+}
+}
+
+export  default function Greet(props) {
+  const {query} = useRouter();
+  console.log(query)
+  return (
+  <h1>Hello {query.name}</h1>
+  )
+}
+```
+
+- 파일명은 [name].js로 해준다
+- 내장 getSeverSidePropsName 함수를 통해 URL에서 동작하는 [name] 변수 값을 가져오는 것
+- name/yun 주소로 가면 “Hello yun” 문구가 렌더링된다.
+
+## 컴포넌트에서 경로 매개변수 사용
+
+- pages 밖에서는 getSeverSideProps나 getStaticProps 함수를 사용하지 못한다
+- useRouter 훅을 이용하면 컴포넌트 안에서 경로 매개변수를 사용할 수 있다.
+- useRouter 훅을 사용해 query 매개 변수를 가져옵니다
+
+## 클라이언트에서의 내비게이션
+
+```jsx
+import React from 'react'
+import Link from 'next/link'
+
+export default function Navbar() {
+  return (
+   <>
+    <div>
+      <Link href="/">Home</Link> |
+      <Link href="/about">about</Link> |
+      <Link href="/contact">contact</Link>
+
+    </div>
+   </>
+  )
+}
+```
+
+- Link 컴포넌트를 사용하여 서로 다른 페이지 간의 이동을 최적화 할 수 있음
+- 다른  페이지 또는 웹 사이트의 일부를 연결할 때 LInk 컴포넌트를 사용합니다
+- Link로 연결된 페이지는 이미 클라이언트에 다운로드된 상태이기 때문에 화면 전환 속도가 바쁨
+
+## 동적 경로 매개 변수
+
+- 중첩 라우팅으로 /blog/[date]/[slug].js 라는 페이지를 연결하는 경우 10버전 이후부터는 as 값을 href값처럼 사용하면 됩니다.
+
+```jsx
+<Link href="/blog/2000-04-01/happyhappy">Post</Link>
+```
+
+## 자동 이미지 최적화
+
+```jsx
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  images:{
+    domains:['cdn.pixabay.com']
+  }
+}
+
+module.exports = nextConfig
+```
+
+- 10 버전 이후부터 image 컴포넌트를 사용해서 이미지를 자동으로 최적화할 수 있습니다
+- 먼저 next.config.js에 images 속성에 다음과 같이 서비스 호스팅명을 추가합니다
+- 이렇게 설정해 두면 해당 도메인에서 가져오는 이미지는 자동으로 최적화 됩니다.
+
+### layout 속성값
+
+- fixed : 이미지의 크기를 지정하면 화면의 크기와 상관 없이 이미지 크기를 유지 합니다
+- Responsive : fixed와 반대 방식으로 화면 크기를 조절하면 그에 따라 이미지를 최적화 해서 제공합니다
+- Intrinsic : fixed와 Responsive를 절반씩 수용합니다. 크기가 작은 화면에서는 이미지 크기를 조절하고, 이미지보다 큰 화면에서는 이미지 크기를 조절하지 않습니다.
+- fill : 부모 요소의 가로와 세로 크기에 따라 이미지를 늘립니다. fill을 사용할 경우 width와 height는 함께 사용할 수 없습니다.
+
+<br>
+
 ## 6주차 정리 (23.10.05)
 ## 정적 사이트 생성(SSG: Static Site Generation)
 
