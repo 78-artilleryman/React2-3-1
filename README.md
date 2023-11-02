@@ -4,6 +4,144 @@
 
 <br>
 
+## 9주차 정리 (23.10.26)
+## 메타 데이터
+
+- 페이스북의 오픈 그래프처럼 공유 자료를 카드 형태로 보내려면 몇가지 메타 데이터를 주 가해야 합니다
+- Nextjs에서은 내장 Head 컴포넌트를 제공하여 이런 메타 데이터를 쉽게 다를 수 있습니다.
+- 어떤 컴포넌트에서든 HTML페이지의 <Head> 내부 데이터를 변경, 추가, 삭제할 수 있습니 다.
+
+﻿다음은 index.js에 title 태그를 추가하는 코드입니다.
+
+```jsx
+export default function Home() {
+  return (
+    <>
+    <Head>
+      <title>이것은 index페이지입니다.</title>
+    </Head>
+    <Navbar></Navbar>
+    <Widget pageName="index"></Widget>
+    </>
+  )
+}
+```
+
+## 실습 1
+
+```jsx
+import React, { useState } from 'react'
+import Head from 'next/head'
+
+export default function Widget({pageName}) {
+  const [active, setActive] = useState(false);
+
+  if(active){
+    return (
+      <>
+      <Head>
+        <title>{pageName} false페이지 입니다.</title>
+      </Head>
+      <div>
+        <button onClick={()=>setActive(false)}>
+          오리지널 타이틀
+        </button>
+        <br/>
+        타이틀을 확인하세요
+      </div>
+
+      </>
+      
+    )
+  }
+  return (
+    <>
+    <Head>
+      <title>{pageName} true페이지 입니다.</title>
+    </Head>
+    <div>
+      <button onClick={()=>setActive(true)}>
+        바뀐 페이지 타이틀
+      </button>
+    </div>
+
+    </>
+    
+  )
+  
+}
+```
+
+- 버튼이 있는 컴포넌트를 만들고, 클릭하면 방문 페이지에 따라 페이지 title이 바뀌게 합니다.
+
+## 실습 2
+
+- HTMLS
+클라이언트에 보내기 전에 특정 작업을 처리해야 하는 경우는 pages/ 디렉토리
+안에 있는 _app.js와 _document.js 페이지를 이용합니다.
+
+[_app.js 페이지]
+
+Next 프로젝트를 생성하면 기본으로 다음과 같은 pages/_appjs 파일이 생성됩니다. 
+
+```jsx
+import "../styles/globals.css";
+function MyAcp({ Component,page.Props}){
+	return <Component { ,,,pagepropw).>;
+}
+export default myApp;
+```
+
+- 이 MyApp 컴포넌트와 그 속성인 pageProps를 반환합니다.
+- 이에 앞서 제작한 Navbar 컴포넌트를 주가 하면 더 이상 index, about, contact 페이지에 Navbar 컴포넌트를 추가하지 않아도 됩니다.
+- 이 뿐만 아니라 pages내의 모든 페이지에 적용 됩니다.
+
+## 다크모드 설정
+
+```jsx
+import '@/styles/globals.css'
+
+import { useState } from 'react'
+import ThemeContext from '@/components/ThemeContext'
+import Navbar from '@/components/Navbar'
+
+const themes = {
+  dark: {
+    background: 'black',
+    color: 'white'
+  },
+  light: {
+    background: 'white',
+    color: 'black'
+  }
+}
+
+export default function App({ Component, pageProps }) {
+
+  const [theme, setTeme] = useState('light')
+  const toggleTheme = () =>{
+    setTeme(theme === 'dark' ? 'light' : 'dark')
+  }
+  return(
+    <>
+    <ThemeContext.Provider value={{theme, toggleTheme}}>
+      <div
+      style={{
+        width: '100%',
+        minHeight: '100vh',
+        ...themes[theme]
+      }}>
+      <Navbar></Navbar>
+      <Component {...pageProps} />
+      </div>
+    </ThemeContext.Provider>
+ 
+    
+    </>
+  ) 
+
+}
+```
 ## 7주차 정리 (23.10.12)
 
 ## 페이지에서 경로 매개변수 사용
