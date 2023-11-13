@@ -4,6 +4,132 @@
 
 <br>
 
+## 11주차 정리 (23.11.09)
+
+## SSR 과 CSR REST API 사용
+
+### 서버에서 REST API 사용하기
+
+- REST API를 호출할 때는 public AP를 호출할 것인지, private API를 호출할 것인지를 먼저 확인해야 합니다.
+- Publie API는 어떤 인증이나 권한도 필요 없으며 누구나 호출할 수 있습니다.
+- Private API는 호출 전 반드시 인증과 권한 검사 과정을 거쳐야 입니다
+- 예를 들어 구글의 AP를 사용하고 싶다면 OAuth 20을 사용해야 합니다. 거의 산업 표준이라고 할 수 있습니다.
+- 이 밖에 API들도 어떻게 인증과 권한 검사 과정을 거치는지 반드시 확인해야 합니다.
+
+위 실습은 Axios를 사용해서 진행되는데
+
+Axios 란? Axios는 **브라우저, Node.js를 위한 Promise API를 활용하는 HTTP 비동기 통신 라이브러리**이다.
+
+프로젝트에 Axios 라이브러리를 설치하기 위해서는 아래와 같은 명령어를 터미널에 입력해 주면 된다.
+
+```bash
+$ npm install axios
+```
+
+그럼 아래와 같은 코드를 실행할 수 있게 된다.
+
+```jsx
+import Link from 'next/link';
+import axios from 'axios';
+
+export async function getServerSideProps(ctx) {
+  const { username } = ctx.query;
+  const { status, data } = await axios.get(`${process.env.API_ENDPOINT}/api/04/users/${username}`, {
+    headers: {
+      authorization: process.env.API_TOKEN,
+    },
+  });
+
+  if (status === 404) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {
+      user: data,
+    },
+  };
+}
+
+function UserPage({ user }) {
+  return (
+    <div>
+      <div>
+        <Link href="/" passHref>
+          Back to home
+        </Link>
+      </div>
+      <hr />
+      <div style={{ display: 'flex' }}>
+        <img src={user.profile_picture} alt={user.username} width={150} height={150} />
+        <div>
+          <div>
+            <b>Username:</b> {user.username}
+          </div>
+          <div>
+            <b>Full name:</b> {user.first_name} {user.last_name}
+          </div>
+          <div>
+            <b>Email:</b> {user.email}
+          </div>
+          <div>
+            <b>Company:</b> {user.company}
+          </div>
+          <div>
+            <b>Job title:</b> {user.job_title}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default UserPage;
+```
+
+위에 코드를 보면 process.env.API_TOKEN가 나와있는데 이걸 왜 사용했느냐
+
+직접 써도 되지만 다음과 같은 이유로 권장하지 않습니다.
+
+1. 인증 토큰은 비밀번호와 같이 반드시 지켜야 할 비밀 정보로 간주해야 합니다
+2. 앱을 로컬에서 실행하면 테스트 토큰을 사용해서 API에 접근하며, 배포한 후에는 다른 토큰을 사용합니다.
+- 환경 변수를 사용하면 서로 다른 배포 및 실행 환경에서 다른 토큰을 더 쉽게 사용할 수 있습니다.
+
+습니다.
+
+3) API 토큰 값이 바뀌면 환경 변수나 설정 파일의 값을 바꾸는 것으로 쉽게 적용할 수 있습니다
+
+- Root 디렉토리에 .env라는 파일을 만들고 다음 코드를 작성합니다.
+- .env 파일은 중요한 정보가 들어 있기 때문에 절대 커밋하면 안 됩니다.
+- .gitignore파일에 등록해 주세요.
+- Next는 .env나 .envlocal 파일을 지원하기 때문에 별도의 설정은 필요하지 않습니다.
+
+### SSR로 데이터를 불러오는 이유
+
+- 서버가 데이터를 불어오는 것이 좀 더 안전함
+- API 엔드포인트 주소, 매개변수 값, HTTP 헤더, 인증 토큰 값 등 중요한 정보가 외부에 노출되지 않기 때문임
+
+### 클라이언트가 데이터 불러오기
+
+- 브라우저에서 HTTP 요청을 보낼 때는 반드시 다음 사항을 지켜야 합니다.
+1. 믿을 수 있는 곳에만 HTTP 요청을 보내야 합니다
+2. SSL 인증서를 통해 안전하게 접근할 수 있는 곳의 HTTP API만 사용해야 합니다.
+3. 브라우저에서 원격 데이터베이스에 직접 연결해서는 안 됩니다.
+
+### 클라이언트에서 REST API 사용하기
+
+- getServersideProps나 getStaticProps함수 내에서 REST API를 호출하면 서버가 데이터를 가져오지만,
+- 그 외의 컴포넌트 내에서 데이터를 불러오는 작업은 클라이언트가 실행합니다.
+- 클라이언트는 주로 주로 두 가지 시점에 데이터를 불러옵니다.
+1. 컴포넌트가 마운트된 후
+2. 특정 이벤트가 발행한 후
+- Next라고 해서 React와 다른 특별한 방법을 사용해야 할 필요는 없습니다.
+- 브라우저의 내장 fetch API 혹은 Axios와 같은 외부 라이브러리를 사용해서 HTTP 요청을 보냅니다.
+
+<br>
+
 ## 10주차 정리 (23.11.02)
 
 
