@@ -4,6 +4,200 @@
 
 <br>
 
+## 13주차 정리(11.23)
+## 지역 및 전역 상태 관리
+
+- 리액트 앱에서는 상태 관리는 아주 중요한 부분입니다.
+- 상태는 동적 정보의 일종입니다.
+    1. 높은 수준의 상호 작용이 가능한 내 구현하거나.
+    2. 더 뛰어난 UX 개발 위한 필수 요소입니다.
+- 최신 웹앱에서는 비가 상태를 사용하고, 관리하는 경우가 많이 있습니다.
+    1. 밝은 테마에서 어두운 테마로 변경하거나,
+    2. 배송 주소를 바꿈으로써 폼의 상태를 변경합니다.
+1. 버튼 클릭 만으로 앱의 상태를 변하게 할 수도 있다.
+- 상태 관리 때문에 앱에 더 뛰어난 상호 작용 등의 기능을 구현할 수 잊지만, 앱의 복잡도는 증가 합 니다.
+- 리액트는 클래스 컴포넌트 시절부터 setState 메소드를 사용해서 상태를 관리했습니다.
+- 리액트 16.8 이후부터는 usestate 혹을 포함한 리액트 흑을 제공합니다.
+- 리액트 앱의 상태 관리가 어려운 것은 데이터의 흐름이 단방향이라는 것입니다.
+- 부모 컴포넌트는 자식에게 속성의 형태로 상태를 전달할 수 있지만, 반대로 자식이 부모에게 태를 전달 할 수 없습니다.
+- 지역 상태는 클래스 컴포넌트나 훅을 사용해서 별다른 어려움 없이 관리할 수 있지만, 전역 상태는 단방향 데이터 흐름 때문에 관리하기가 힘듭니다.
+
+### 지역 상태 관리
+
+```jsx
+import React, ( useState } from "react";
+function Counter { initialCount = 0 )) {
+const [count, setCount] = useState(initialCount);
+
+return (
+‹div›
+<b>Count is: {count)</b><br />
+‹button onClick=(() = setCount (count + 1)}›
+Increment +
+</button>
+<button onClick={() = setCount (count - 1)}>
+Decrement - </button>
+</div>
+
+export default Counter;
+```
+
+- 지역 상태 관리에 있어서 앱의 상태는 컴포넌트 스코프 상태를 의미합니다.
+- Increment버튼을 클릭하면 현재 click하면 count값에 1을 더하고, Decrement버튼을 클릭하면 현재 값에서 1을 뺍니다.
+- 부모 컴포넌트는 자식에게 initialCount라는 속성값을 통해서 초기 counter값을 쉽게 전달할 수 있습니다
+- 이 때는 useState 흑만으로 필요한 모든 것을 구현할 수 입니다
+
+### 전역 상태 관리
+
+- 전역 상태는 여러 컴포넌트가 공유하는 상태를 의미합니다.
+- 즉, 어떤 컴포넌트라도 접근 및 수정이 가능한 상태인 것입니다.
+- Vue.js4 Angular와는 다르게 React는 데이터 흐름이 단방향 입니다.
+- 단방향의 데이터 흐름은 1) 오류 발생 가능성을 줄여 주고, 2) 디버깅하기 쉬우며 효율적이라는 장점이 있습니다.
+- 반면 앱 개발이 더 복잡해 진다는 단점도 있습니다.
+- 예를 들어 상품목록 카드에서 원하는 물건을 고르면, 장바구니에 담긴 항목의 숫자를 표시하는 기 능을 구현 한다고 생각해 보면 어려움을 잘 알 수 있습니다.
+- 내비게이션 바와 상품 목록 카드 간에 어떠한 연결점도 없기 때문입니다.
+- 카드 컴포넌트가 가지고 있는 데이터 들은 언마운트 되는 즉시 지역 상태를 잃게 됩니다
+- 최근 앱에서는 다양한 라이브러리를 사용해서 이런 상태 관리를 구현합니다.
+
+## 12주차 정리(11.16)
+## GraphQL API
+
+2012년에 메타(페이스북)에서 개발했습니다
+
+- API에서 사용할 수 있는 질의어로 RESTLI SOAP 같은 방식과는 다른 새로운 관점으로 API
+데이터를 다릅니다.
+- 꼭 필요한 데이터만 불러오도록 지정할 수 있습니다
+- 한 번의 요청으로 여러 곳의 데이터를 불러올 수 있습니다 시용형 네이티에 대해 정적이면서도 강력한 타입 시스템을 제공합니다.
+이 밖에도 많은 장점을 가지고 있습니다.
+- 아래와 같이 사용할 수 있습니다
+
+```jsx
+import { ApolloServer, gql } from 'apollo-server-micro';
+import GraphQLJSON from 'graphql-type-json';
+import 'crypto';
+
+const sign_db = []
+
+function uuidv4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+    });
+}
+
+const typeDefs = gql`
+    scalar JSON
+    input InsertSign {
+        nickname: String!,
+        content: String!,
+        country: String
+    }
+    type Query {
+        sign(offset: Int!, limit: Int!, order_by: JSON): [Sign]!,
+    }
+    type Mutation {
+        insert_sign(objects: InsertSign): NewSign,
+    }
+    type NewSign {
+        returning: Sign,
+    }
+    type Sign {
+        uuid: ID,
+        created_at: String
+        content: String,
+        nickname: String,
+        country: String
+    }
+`;
+
+const resolvers = {
+    Query: {
+        sign(_, args) {
+            const variable = JSON.parse(JSON.stringify(args));
+            const offset = variable.offset;
+            const limit = variable.limit;
+            const order_by = variable.order_by.created_at;
+            const sort_func = order_by.created_at === 'desc'
+                ? (a, b) => Number(a.created_at) - Number(b.created_at)
+                : (a, b) => Number(b.created_at) - Number(a.created_at)
+            const signlist = sign_db.sort(sort_func).slice(offset, offset+limit)
+            return signlist
+        },
+    },
+    Mutation: {
+        insert_sign(_, objects) {
+            const uuid = uuidv4();
+            const contents = JSON.parse(JSON.stringify(objects));
+            const created_at = Date.now();
+            const newSign = {
+                ...contents.objects,
+                created_at,
+                uuid,
+            }
+            sign_db.push(newSign);
+            return {returning: newSign};
+        },
+    }
+};
+
+const apolloServer = new ApolloServer({ typeDefs, resolvers });
+const startServer = apolloServer.start();
+
+export default async function handler(req, res) {
+    await startServer;
+    await apolloServer.createHandler({
+      path: "/api/graphql",
+    })(req, res);    
+}
+
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
+```
+
+```jsx
+import Link from 'next/link';
+import { useQuery } from '@apollo/client';
+import GET_LATEST_SIGNS from "../lib/apollo/queris/getLatestSigns";
+import Sign from '../components/Sign';
+import Loading from '../components/Loding';
+
+function HomePage() {
+  const { loading, data } = useQuery(GET_LATEST_SIGNS, {
+    fetchPolicy: 'no-cache',
+  });
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  return (
+    <div className="flex justify-center items-center flex-col mt-20">
+      <h1 className="text-3xl mb-5">Real-World Next.js signbook</h1>
+      <Link href="/new-sign">
+        <button className="mb-8 border-2 border-purple-800 text-purple-900 p-2 rounded-lg text-gray-50 m-auto mt-4">
+          Add new sign
+        </button>
+      </Link>
+      <div>
+        {data.sign.map((sign) => (
+          <Sign key={sign.uuid} {...sign} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default HomePage;
+```
+
+- Apollo 트라이어트를 초기화하기 위한 함수를 추가합니다. 113페이지 하단의 코드
+- 이 함수를 사용하면 페이지마다 새로운 Apollo 클라이언트를 만들지 않아도 됩니다
+- 대신 글라이언트 인스턴스를 apolloClient 변수에 저장하여, 인스턴스를 함수 인자에 초기 상태값으로 전달합니다.
+- 해당 함수는 지역 캐시값과 전달받은 조기 상태값을 합쳐서 전체 상태값을 만들어 사용합니다
+
 ## 11주차 정리 (23.11.09)
 
 ## SSR 과 CSR REST API 사용
