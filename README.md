@@ -4,6 +4,240 @@
 
 <br>
 
+## 14주차 정리(11.30)
+
+## css와 내장 스타일링 메서드
+
+### 1. Styled JSX
+
+"Next.js"는 React 기반의 웹 프레임워크로, 클라이언트 및 서버 사이드 렌더링, 라우팅, 코드 분할 등을 지원하는데, "styled-jsx"는 Next.js에서 제공하는 CSS-in-JS 라이브러리 중 하나입니다. "styled-jsx"를 사용하면 JavaScript 파일 안에서 CSS 스타일을 정의할 수 있습니다.
+
+"Next.js"와 "styled-jsx"를 함께 사용할 때, "styled-jsx"는 기본적으로 각 컴포넌트에 대한 스타일을 지정하는 데 사용됩니다. "styled-jsx"를 통해 정의된 스타일은 해당 컴포넌트의 스코프에만 적용되므로 전역 스타일 충돌을 방지할 수 있습니다.
+
+아래는 "styled-jsx"를 사용한 예시입니다:
+
+- 기본 사용법
+
+```jsx
+const MyComponent = () => (
+  <div>
+    <p>Some text</p>
+    <style jsx>{`
+      p {
+        color: red;
+      }
+    `}</style>
+  </div>
+);
+```
+
+위의 예시에서 **`<style jsx>`** 태그 내부에 작성된 CSS는 **`MyComponent`** 컴포넌트에만 적용됩니다.
+
+- 동적 스타일링
+
+```jsx
+const dynamicColor = 'blue';
+
+const DynamicStyleComponent = () => (
+  <div>
+    <p>Dynamic styling</p>
+    <style jsx>{`
+      p {
+        color: ${dynamicColor};
+      }
+    `}</style>
+  </div>
+);
+```
+
+위의 예시에서 **`${dynamicColor}`**를 통해 JavaScript 변수를 사용하여 동적으로 스타일을 정의할 수 있습니다.
+
+- **글로벌 스타일링**
+
+```jsx
+export default () => (
+  <div>
+    <p>Global styling</p>
+    <style jsx global>{`
+      body {
+        background: #f0f0f0;
+      }
+    `}</style>
+  </div>
+);
+```
+
+의 예시에서 **`<style jsx global>`**을 사용하여 글로벌 스타일을 정의하고 있습니다.
+
+"styled-jsx"를 사용하면 컴포넌트 기반의 스타일링을 할 수 있어 유지보수성이 높아지며, 동시에 스타일 관리가 간편해집니다.
+
+### CSS Module
+
+CSS Modules는 CSS를 모듈화하여 컴포넌트 범위에서 스타일을 관리하는 방법 중 하나입니다. 이를 통해 전역 스코프를 방지하고, 스타일을 모듈로 구성하여 재사용성을 높일 수 있습니다. 주로 React와 함께 사용되며, Next.js와 Create React App 등의 프로젝트에서 기본적으로 지원됩니다.
+
+여기에는 CSS Modules의 기본적인 사용법이 포함되어 있습니다:
+
+- **CSS 모듈 생성:**
+
+CSS 모듈은 파일 이름에 **`.module.css`** 확장자를 사용하여 생성됩니다.
+
+```css
+cssCopy code
+/* styles.module.css */
+
+.myComponent {
+  color: blue;
+}
+
+.button {
+  background-color: green;
+}
+
+```
+
+- **React 컴포넌트에서 사용:**
+    
+    React 컴포넌트에서 해당 CSS 모듈을 불러와 사용합니다.
+    
+    ```jsx
+    jsxCopy code
+    // MyComponent.jsx
+    
+    import React from 'react';
+    import styles from './styles.module.css';
+    
+    const MyComponent = () => (
+      <div className={styles.myComponent}>
+        <p>This is styled using CSS Modules</p>
+        <button className={styles.button}>Click me</button>
+      </div>
+    );
+    
+    export default MyComponent;
+    
+    ```
+    
+    위의 예시에서 **`styles.myComponent`** 및 **`styles.button`**은 CSS 클래스 선택자로 사용되며, 이들은 실제로 컴파일된 클래스 이름과 매핑됩니다.
+    
+- **동적 클래스 이름 사용:**
+    
+    동적으로 클래스 이름을 생성할 수도 있습니다.
+    
+    ```jsx
+    jsxCopy code
+    import React from 'react';
+    import styles from './styles.module.css';
+    
+    const isDisabled = true;
+    
+    const MyComponent = () => (
+      <button className={`${styles.button} ${isDisabled ? styles.disabled : ''}`}>
+        Click me
+      </button>
+    );
+    
+    ```
+    
+    위의 예시에서 **`styles.disabled`**는 조건에 따라 동적으로 적용되는 클래스입니다.
+    
+
+CSS Modules를 사용하면 클래스 이름이 전역 스코프로 노출되지 않으므로 클래스 이름 충돌이 방지됩니다. 또한, 코드 내에서 클래스 이름을 하드코딩하는 것이 아니라 모듈에서 가져와 사용하므로 코드 유지보수성이 향상됩니다.
+
+Sass는 Syntactically Awesome Stylesheets의 약자로, CSS의 확장된 문법을 제공하는 CSS 전처리기입니다. Sass를 사용하면 반복 코드를 줄이고, 변수, 중첩 규칙, 함수 등을 활용하여 스타일시트를 더 효과적으로 관리할 수 있습니다. Sass는 두 가지 구문을 제공하는데, 하나는 SCSS(Sassy CSS)이고 다른 하나는 들여쓰기 기반의 문법입니다.
+
+### **SCSS 구문:**
+
+1. **변수 사용:**
+    
+    ```scss
+    scssCopy code
+    $primary-color: #3498db;
+    
+    .myComponent {
+      color: $primary-color;
+    }
+    
+    ```
+    
+2. **중첩 규칙:**
+    
+    ```scss
+    scssCopy code
+    nav {
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+    
+      li { display: inline-block; }
+    
+      a {
+        text-decoration: none;
+    
+        &:hover {
+          border-bottom: 1px solid #ccc;
+        }
+      }
+    }
+    
+    ```
+    
+3. **파일 분할:**
+    
+    Sass를 여러 파일로 나누고 **`@import`**를 사용하여 합칠 수 있습니다.
+    
+    ```scss
+    scssCopy code
+    // _variables.scss
+    $primary-color: #3498db;
+    
+    // styles.scss
+    @import '_variables';
+    
+    .myComponent {
+      color: $primary-color;
+    }
+    
+    ```
+    
+
+### **들여쓰기 기반의 문법:**
+
+1. **변수 사용:**
+    
+    ```sass
+    sassCopy code
+    $primary-color: #3498db
+    
+    .myComponent
+      color: $primary-color
+    
+    ```
+    
+2. **중첩 규칙:**
+    
+    ```sass
+    sassCopy code
+    nav
+      ul
+        margin: 0
+        padding: 0
+        list-style: none
+    
+      li
+        display: inline-block
+    
+      a
+        text-decoration: none
+    
+        &:hover
+          border-bottom: 1px solid #ccc
+    
+    ```
+    
+
+Sass는 CSS로 컴파일되어 웹 브라우저에서 해석됩니다. 다양한 기능과 유용한 도구를 제공하여 스타일 시트의 가독성과 유지보수성을 향상시킬 수 있습니다. Sass는 주로 프로젝트에서 스타일링 작업을 수행하는데 사용되며, 많은 웹 개발자들에게 사랑받고 있습니다.
 ## 13주차 정리(11.23)
 ## 지역 및 전역 상태 관리
 
